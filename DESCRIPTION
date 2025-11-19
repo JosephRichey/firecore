@@ -1,11 +1,15 @@
 Package: firecore
-Title: What the Package Does (One Line, Title Case)
+Title: Utilities for FireData Suite of Apps
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person("Joseph", "Richey", , "jwrichey.1@gmail.com", role = c("aut", "cre"))
+Description: This package provides functions for the apps developed in FireData.
+License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.0.0
+RoxygenNote: 7.3.3
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    dplyr
