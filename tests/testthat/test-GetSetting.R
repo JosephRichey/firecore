@@ -3,5 +3,6 @@ test_that("multiplication works", {
 })
 
 test_that("Call GetSetting", {
-  expect_equal(GetSetting(), 'Hello from GetSetting')
+  expect_equal(GetSetting('global', 'date_format'), '%m-%d-%Y')
+  expect_equal(GetSetting('global', group = 'time'), c('America/Edmonton', '%m-%d-%Y', "%m-%d-%Y %H:%M"))
 })

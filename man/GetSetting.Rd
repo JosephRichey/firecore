@@ -21,5 +21,7 @@ The desired setting in a character vector.
 Get Setting
 }
 \examples{
-GetSetting()
+\dontrun{
+GetSetting('global', key = 'tz')
+}
 }
