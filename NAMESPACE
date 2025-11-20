@@ -2,3 +2,11 @@
 
 export(GetSetting)
 export(InitializePackage)
+export(ParseRelativeDate)
+importFrom(lubridate,"%m+%")
+importFrom(lubridate,ceiling_date)
+importFrom(lubridate,days)
+importFrom(lubridate,floor_date)
+importFrom(lubridate,weeks)
+importFrom(lubridate,with_tz)
+importFrom(lubridate,years)

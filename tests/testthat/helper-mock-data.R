@@ -28,7 +28,8 @@ get_mock_app_data <- function() {
                       "Is the address", "Regex for category",
                       "Message to show"),
       stringsAsFactors = FALSE
-    )
+    ),
+    current_local_date = Sys.time() |> with_tz('America/Denver') |> as.Date()
   )
 }
 
