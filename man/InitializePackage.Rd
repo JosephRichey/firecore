@@ -2,13 +2,38 @@
 % Please edit documentation in R/zzz.R
 \name{InitializePackage}
 \alias{InitializePackage}
-\title{Initialize the package data store}
+\title{Initialize the firecore package}
 \usage{
 InitializePackage(app_data)
 }
 \arguments{
-\item{app_data}{The app_data object containing Setting and other tables}
+\item{app_data}{A list containing your application's data tables. This is what
+is loaded into the app_data module.}
+}
+\value{
+Invisibly returns \code{TRUE} on success. Prints a confirmation message.
 }
 \description{
-Initialize the package data store
+This function must be called once at application startup to initialize the
+firecore package with your application data. It stores the app_data object
+in the package environment, making it available to all firecore functions
+like \code{\link{GetSetting}}.
+}
+\examples{
+\dontrun{
+# Load your application data
+app_data <- list(
+  current_local_date = Sys.time() |> lubridate::with_tz('America/Denver') |> as.Date()
+)
+
+# Initialize the package
+InitializePackage(app_data)
+
+# Now you can use other firecore functions
+ParseRelativeDate('CM')
+}
+
+}
+\seealso{
+\code{\link{GetSetting}}
 }

@@ -13,10 +13,7 @@
 #' GetSetting('global', key = 'tz')
 #' }
 GetSetting <- function(domain, key = NULL, group = NULL) {
-
-  if (is.null(.pkg_env$app_data)) {
-    stop("Package not initialized. Call InitializePackage(app_data) first.")
-  }
+  .CheckPackageEnv()
 
   app_data <- .pkg_env$app_data
 
@@ -24,17 +21,20 @@ GetSetting <- function(domain, key = NULL, group = NULL) {
     dplyr::filter(domain == !!domain)
 
   if (!is.null(group)) {
-    Filtered <- Filtered |> dplyr::filter(setting_group == !!group)
+    Filtered <- Filtered |>
+      dplyr::filter(setting_group == !!group)
   }
 
   if (!is.null(key)) {
-    Filtered <- Filtered |> dplyr::filter(setting_key == !!key)
+    Filtered <- Filtered |>
+      dplyr::filter(setting_key == !!key)
   }
 
   # If no matching key, return nothing and show a warning
   if (nrow(Filtered) == 0) {
-    log_error(glue("No setting found for domain '{domain}' and key '{key}'"),
-              namespace = "GetSetting")
+    logger::log_error(
+      glue::glue("No setting found for domain '{domain}' and key '{key}'"),
+      namespace = "GetSetting")
     return(NA)
   }
 

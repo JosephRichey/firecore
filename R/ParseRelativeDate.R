@@ -72,11 +72,15 @@
 
 
 ParseRelativeDate <- function(relativeString, type = c("start", "end"), refDate = .pkg_env$app_data$current_local_date) {
+  .CheckPackageEnv()
+
   type <- match.arg(type)
   today <- refDate
 
+  relativeString <- toupper(relativeString)
+
   # Handle 'today' explicitly
-  if (tolower(relativeString) == "today") {
+  if (relativeString == "TODAY") {
     return(refDate)
   }
 
