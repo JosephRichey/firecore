@@ -33,7 +33,7 @@ cat('Intitializing package for tests\n', file = stderr())
       ),
       setting_key = c(
         # Global
-        "password", "tz", "date_format", "date_time_format", "sidebar_open",
+        "password", "ltz", "date_format", "date_time_format", "sidebar_open",
         "fire_dept_id", "safe_delete",
         # Incident
         "input_secondary", "canceled", "dropped", "address",

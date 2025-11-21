@@ -4,7 +4,7 @@ test_that("GetSetting returns string values correctly", {
   expect_equal(result, "123")
   expect_type(result, "character")
 
-  result <- GetSetting("global", key = "tz")
+  result <- GetSetting("global", key = "ltz")
   expect_equal(result, "America/Denver")
   expect_type(result, "character")
 
@@ -141,7 +141,7 @@ test_that("GetSetting handles relative_date type", {
 
 test_that("GetSetting with both key and group returns correct subset", {
   # Get time settings with specific key
-  result <- GetSetting("global", key = "tz", group = "time")
+  result <- GetSetting("global", key = "ltz", group = "time")
   expect_equal(result, "America/Denver")
   expect_length(result, 1)
 })
