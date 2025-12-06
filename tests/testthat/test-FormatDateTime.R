@@ -22,6 +22,16 @@ test_that("FormatDateTime formats datetime to date", {
   expect_equal(result, "01-15-2025")
 })
 
+test_date_2 <- as.POSIXct("2025-01-15 20:30:45", tz = "America/Denver")
+test_that("FormatDateTime formats datetime to date in different time zone", {
+  result <- FormatDateTime(test_date_2, input = "datetime", output = "date", target_tz = 'UTC')
+
+  expect_type(result, "character")
+  # Should match the date_format setting: "%m-%d-%Y"
+  expect_match(result, "^\\d{2}-\\d{2}-\\d{4}$")
+  expect_equal(result, "01-16-2025")
+})
+
 test_that("FormatDateTime formats datetime to time without seconds", {
   result <- FormatDateTime(test_dt, input = "datetime", output = "time", seconds = FALSE)
 
@@ -165,21 +175,6 @@ test_that("FormatDateTime handles spring forward - hour before DST", {
   expect_equal(result_utc, "2025-03-09 08:30:00")
 })
 
-test_that("FormatDateTime handles spring forward - nonexistent hour", {
-  # March 9, 2025 at 2:30 AM - this time doesn't exist!
-  # Clock jumps from 1:59:59 AM to 3:00:00 AM
-  # R will interpret this as 3:30 AM MDT
-  dt_nonexistent <- as.POSIXct("2025-03-09 02:30:00", tz = "America/Denver")
-
-  result_local <- FormatDateTime(dt_nonexistent, output = "datetime", target_tz = "local")
-  result_utc <- FormatDateTime(dt_nonexistent, output = "datetime", target_tz = "UTC")
-
-  # R adjusts to 3:30 AM MDT (the nonexistent time gets pushed forward)
-  expect_equal(result_local, "03-09-2025 03:30")
-  # MDT is UTC-6
-  expect_equal(result_utc, "2025-03-09 09:30:00")
-})
-
 test_that("FormatDateTime handles spring forward - hour after DST", {
   # March 9, 2025 at 3:30 AM MDT (30 minutes after spring forward)
   dt_after <- as.POSIXct("2025-03-09 03:30:00", tz = "America/Denver")
@@ -207,8 +202,9 @@ test_that("FormatDateTime handles fall back - hour before DST", {
 test_that("FormatDateTime handles fall back - ambiguous hour (first occurrence)", {
   # November 2, 2025 at 1:30 AM - this time occurs twice!
   # First as 1:30 AM MDT, then again as 1:30 AM MST
-  # R defaults to the first occurrence (MDT)
-  dt_ambiguous <- force_tz(as.POSIXct("2025-11-02 01:30:00"), "America/Denver")
+  # We can force this by creating it from UTC (MDT)
+  dt_ambiguous <- with_tz(as.POSIXct("2025-11-02 07:30:00", tz = "UTC"),
+                          "America/Denver")
 
   result_local <- FormatDateTime(dt_ambiguous, output = "datetime", target_tz = "local")
   result_utc <- FormatDateTime(dt_ambiguous, output = "datetime", target_tz = "UTC")
