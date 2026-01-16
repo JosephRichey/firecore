@@ -17,61 +17,26 @@ The goal of firecore is to make functions that are resuseud across the [FireData
 ## Installation
 
 ``` r
-# Install from local source
-install.packages("path/to/firecore", repos = NULL, type = "source")
-
-# Or using remotes
-remotes::install_local("path/to/firecore")
+# Install
+remotes::install_github('JosephRichey/firecore')
 ```
 
 ## Quick Start
 
 ### 1. Configure Your App
 
-In your app's `global.R`:
+In your app's `main.R`:
 
 ``` r
-library(firecore)
-
 # Set default tables for this app
 options(firecore.default_tables = c('training', 'firefighter', 'attendance'))
-
-# Set up database connection
-app_data <- list(
-  CON = DBI::dbConnect(...)
-)
 ```
 
-### 2. Use in Your Shiny Server
+In your app's main server:
 
 ``` r
-server <- function(input, output, session) {
-  # Create reactive values
-  rdfs <- reactiveValues()
-  
-  # Load data on startup
-  observe({
-    UpdateReactives(rdfs)  # Uses configured default tables
-  }) |> bindEvent(session$clientData, once = TRUE)
-  
-  # Use the data
-  output$table <- renderTable({
-    req(rdfs$training)
-    rdfs$training |> 
-      select(start_time, end_time, training_type) |>
-      FixColNames()
-  })
-  
-  # Log user actions
-  observeEvent(input$submit_button, {
-    result <- dbExecute(app_data$CON, "INSERT INTO ...")
-    
-    if (CheckWriteResult(result, "Training added", "inserting training")) {
-      AuditLog("Added training record", session)
-      UpdateReactives(rdfs, "training")
-    }
-  })
-}
+# Initiliaze package environment with app data.
+InitializePackage(app_data)
 ```
 
 ## Core Functions
@@ -84,10 +49,10 @@ Query database tables with automatic schema support and SQL injection protection
 
 ``` r
 # Simple table query
-patients <- QueryDatabase("patients")
+patients <- QueryDatabase("firefighter")
 
-# Schema-qualified query (SQL Server: [dbo].[patients])
-patients <- QueryDatabase("dbo.patients")
+# Schema-qualified query
+patients <- QueryDatabase("dbo.firefighter")
 ```
 
 #### `CheckWriteResult(result, successMessage, context, ...)`
@@ -129,7 +94,19 @@ UpdateReactives(rdfs)
 UpdateReactives(rdfs, c("incidents", "apparatus"))
 ```
 
-**Automatic Transformations:** - `training`: Converts `start_time` and `end_time` to local timezone - `attendance`: Converts `check_in` and `check_out` to local timezone - `incident`: Converts `incident_start` and `incident_end` to local timezone - `response`: Converts `response_start` and `response_end` to local timezone - `firefighter`: Converts `start_date` to local timezone and sorts by `display_order` - `firefighter_response`: Replaces NA `time_adjustment` values with 0
+**Automatic Transformations:**
+
+-   `training`: Converts `start_time` and `end_time` to local timezone
+
+-   `attendance`: Converts `check_in` and `check_out` to local timezone
+
+-   `incident`: Converts `incident_start` and `incident_end` to local timezone
+
+-   `response`: Converts `response_start` and `response_end` to local timezone
+
+-   `firefighter`: Converts `start_date` to local timezone and sorts by `display_order`
+
+-   `firefighter_response`: Replaces NA `time_adjustment` values with 0
 
 ### Date/Time Utilities
 
@@ -233,7 +210,13 @@ app_data <- list(
 
 ### Timezone Awareness
 
-All datetime functions in `firecore` are timezone-aware, critical for accurate emergency response timestamps. The package handles: - UTC to local timezone conversions - DST transitions - Date-only vs datetime handling
+All datetime functions in `firecore` are timezone-aware, critical for accurate reporting. The package handles:
+
+-   UTC to local timezone conversions
+
+-   DST transitions
+
+-   Date-only vs datetime handling
 
 ### Security
 
@@ -281,10 +264,6 @@ The package includes comprehensive tests covering: - Database operations (mocked
 -   shiny (for reactive context)
 -   testthat (\>= 3.0.0, for testing)
 -   withr (for test isolation)
-
-## Contributing
-
-This is an internal package for fire department applications. For bug reports or feature requests, please contact the development team.
 
 ## Common Patterns
 
