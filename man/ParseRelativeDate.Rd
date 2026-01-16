@@ -85,13 +85,13 @@ Offset codes adjust the reference date by a number of time units:
 }
 
 }
-
-\subsection{Parameters}{
-}
 }
 \examples{
 # Must call initialize package before use
-InitializePackage(list(current_local_date = Sys.time() |> lubridate::with_tz('America/Denver') |> as.Date()))
+InitializePackage(list(
+current_local_date = Sys.time() |>
+lubridate::with_tz('America/Denver')
+|> as.Date()))
 # Using snap codes
 ParseRelativeDate("CM")           # Start of current month
 ParseRelativeDate("CM", "end")    # End of current month

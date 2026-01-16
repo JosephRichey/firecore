@@ -77,7 +77,7 @@ BuildDateTime <- function(
   tz_local <- GetSetting("global", key = "ltz")
 
   # If input is posix, strip out time. shinyinputs automatically add a date.
-  if (is.POSIXct(time) | is.POSIXlt(time)) {
+  if (lubridate::is.POSIXct(time) || lubridate::is.POSIXlt(time)) {
     time <- time |>
       hms::as_hms() |>
       as.character()
