@@ -355,4 +355,4 @@ You should have received a copy of the GNU General Public License along with thi
 
 ## Support
 
-For questions or issues, contact: \[jwrichey.1\@gmail.com\]\
+For questions or issues, contact: [jwrichey.1\@gmail.com](mailto:jwrichey.1@gmail.com)
