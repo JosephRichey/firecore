@@ -37,6 +37,10 @@
 #'
 #' @export
 AuditLog <- function(userAction, session) {
+  .CheckPackageEnv()
+
+  app_data <- .pkg_env$app_data
+
   # Validate inputs
   if (!is.character(userAction) || length(userAction) != 1) {
     stop("'userAction' must be a single character string")

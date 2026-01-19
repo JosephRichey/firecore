@@ -46,6 +46,10 @@
 #'
 #' @export
 QueryDatabase <- function(tableName) {
+  .CheckPackageEnv()
+
+  app_data <- .pkg_env$app_data
+
   # Validate input
   if (!is.character(tableName) || length(tableName) != 1) {
     stop("'tableName' must be a single character string")
@@ -64,7 +68,7 @@ QueryDatabase <- function(tableName) {
   }
 
   # Check if connection exists
-  if (!exists("app_data", envir = .GlobalEnv) || is.null(app_data$CON)) {
+  if (is.null(app_data$CON)) {
     logger::log_error(
       "Database connection not found",
       namespace = "QueryDatabase"
