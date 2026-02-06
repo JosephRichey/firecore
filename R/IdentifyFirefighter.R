@@ -11,6 +11,7 @@
 #' # inside a module server
 #' IdentifyFirefighterModal(session$ns)
 #' }
+#' @export
 IdentifyFirefighterModal <- function(ns) {
   .CheckPackageEnv() # Ensure package environment is loaded
   app_data <- .pkg_env$app_data
@@ -65,6 +66,7 @@ IdentifyFirefighterModal <- function(ns) {
 #' # inside a module server
 #' IdentifyFirefighterServer(input, output, session)
 #' }
+#' @export
 IdentifyFirefighterServer <- function(input, output, session) {
   shiny::observe({
     .CheckPackageEnv() # Ensure package environment is loaded
