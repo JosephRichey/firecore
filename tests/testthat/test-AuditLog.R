@@ -7,12 +7,12 @@ library(RSQLite)
 
 # Mock session object creator
 createMockSession <- function(user = "testUser") {
-  list(user = user)
+  .pkg_env$app_data$Current_User <- user
 }
 
 # Test basic logging functionality
 test_that("AuditLog writes to database correctly", {
-  mockSession <- createMockSession("john.doe")
+  createMockSession("john.doe")
 
   # Get count before
   countBefore <- dbGetQuery(
@@ -21,7 +21,7 @@ test_that("AuditLog writes to database correctly", {
   )$n
 
   # Execute
-  result <- AuditLog("Viewed patient record", mockSession)
+  result <- AuditLog("Viewed patient record")
 
   # Verify
   expect_equal(result, 1)
@@ -46,10 +46,10 @@ test_that("AuditLog writes to database correctly", {
 
 # Test handling of NULL username
 test_that("AuditLog handles NULL username correctly", {
-  mockSession <- createMockSession(NULL)
+  createMockSession(NULL)
 
   # Execute
-  result <- AuditLog("Anonymous action", mockSession)
+  result <- AuditLog("Anonymous action")
 
   # Verify last entry
   lastEntry <- dbGetQuery(
@@ -62,7 +62,7 @@ test_that("AuditLog handles NULL username correctly", {
 
 # Test multiple log entries
 test_that("AuditLog handles multiple entries correctly", {
-  mockSession <- createMockSession("jane.smith")
+  createMockSession("jane.smith")
 
   # Get count before
   countBefore <- dbGetQuery(
@@ -71,9 +71,9 @@ test_that("AuditLog handles multiple entries correctly", {
   )$n
 
   # Execute multiple logs
-  AuditLog("Action 1", mockSession)
-  AuditLog("Action 2", mockSession)
-  AuditLog("Action 3", mockSession)
+  AuditLog("Action 1")
+  AuditLog("Action 2")
+  AuditLog("Action 3")
 
   # Verify count increased by 3
   countAfter <- dbGetQuery(
@@ -95,39 +95,27 @@ test_that("AuditLog handles multiple entries correctly", {
 
 # Test input validation
 test_that("AuditLog validates inputs correctly", {
-  mockSession <- createMockSession("test.user")
+  createMockSession("test.user")
 
   # Test invalid userAction (not character)
   expect_error(
-    AuditLog(123, mockSession),
+    AuditLog(123),
     "'userAction' must be a single character string"
   )
 
   # Test invalid userAction (vector)
   expect_error(
-    AuditLog(c("Action 1", "Action 2"), mockSession),
+    AuditLog(c("Action 1", "Action 2")),
     "'userAction' must be a single character string"
-  )
-
-  # Test missing session
-  expect_error(
-    AuditLog("Some action"),
-    "'session' must be provided"
-  )
-
-  # Test NULL session
-  expect_error(
-    AuditLog("Some action", NULL),
-    "'session' must be provided"
   )
 })
 
 # Test SQL injection protection
 test_that("AuditLog prevents SQL injection", {
-  mockSession <- createMockSession("test'; DROP TABLE audit_log; --")
+  createMockSession("test'; DROP TABLE audit_log; --")
 
   # Execute with malicious input
-  result <- AuditLog("Action with 'quotes' and \"double quotes\"", mockSession)
+  result <- AuditLog("Action with 'quotes' and \"double quotes\"")
 
   # Verify table still exists and data is safely stored
   expect_true(dbExistsTable(.pkg_env$app_data$CON, "audit_log"))
@@ -155,11 +143,11 @@ test_that("AuditLog handles database errors gracefully", {
   dbDisconnect(bad_con)
   .pkg_env$app_data <- list(CON = bad_con)
 
-  mockSession <- createMockSession("test.user")
+  createMockSession("test.user")
 
   # Execute and expect warning
   expect_warning(
-    result <- AuditLog("Test action", mockSession),
+    result <- AuditLog("Test action"),
     "Failed to write to audit log"
   )
 
@@ -172,11 +160,11 @@ test_that("AuditLog handles database errors gracefully", {
 
 # Test special characters
 test_that("AuditLog handles special characters correctly", {
-  mockSession <- createMockSession("user@domain.com")
+  createMockSession("user@domain.com")
 
   # Test with various special characters
   specialAction <- "Updated field: O'Brien's data with 100% accuracy & <tags>"
-  result <- AuditLog(specialAction, mockSession)
+  result <- AuditLog(specialAction)
 
   # Verify last entry
   lastEntry <- dbGetQuery(

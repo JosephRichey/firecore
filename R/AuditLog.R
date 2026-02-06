@@ -2,12 +2,10 @@
 #'
 #' Records user actions to the audit_log database table with timestamp and
 #' username information. Used for compliance, security monitoring, and
-#' activity tracking.
+#' activity tracking. Username comes when using the IdentifyFirefighter module.
 #'
 #' @param userAction A character string describing the action performed by
 #'   the user (e.g., "Viewed patient record", "Modified data", "Logged in").
-#' @param session A Shiny session object containing user authentication
-#'   information. The username is extracted from `session$user`.
 #'
 #' @return Invisibly returns the number of rows affected (typically 1 on success).
 #'
@@ -26,17 +24,17 @@
 #' @examples
 #' \dontrun{
 #' # Log a patient record view
-#' AuditLog("Viewed patient record #12345", session)
+#' AuditLog("Viewed patient record #12345")
 #'
 #' # Log a data modification
-#' AuditLog("Updated patient demographics", session)
+#' AuditLog("Updated patient demographics")
 #'
 #' # Log a login event
-#' AuditLog("User logged in", session)
+#' AuditLog("User logged in")
 #' }
 #'
 #' @export
-AuditLog <- function(userAction, session) {
+AuditLog <- function(userAction) {
   .CheckPackageEnv()
 
   app_data <- .pkg_env$app_data
@@ -44,10 +42,6 @@ AuditLog <- function(userAction, session) {
   # Validate inputs
   if (!is.character(userAction) || length(userAction) != 1) {
     stop("'userAction' must be a single character string")
-  }
-
-  if (missing(session) || is.null(session)) {
-    stop("'session' must be provided")
   }
 
   # Extract username safely
