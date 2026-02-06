@@ -38,7 +38,11 @@ utils::globalVariables(c(
   "incident_end",
   "start_date",
   "display_order",
-  "time_adjustment"
+  "time_adjustment",
+  "full_name",
+  "is_active",
+  "id",
+  "firefighter_pin"
 ))
 
 # Note: is.POSIXct and is.POSIXlt should be prefixed with lubridate::

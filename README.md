@@ -134,6 +134,47 @@ ConvertToLocalPosix("2024-01-15 10:00:00", input = "datetime", output = "datetim
 ConvertToLocalPosix("2024-01-15", input = "date", output = "date")
 ```
 
+### Shiny Modules
+
+#### Identify Firefighter
+
+This module provides a lightweight sign-in system for firefighters using a **name + PIN** approach. It consists of a **modal UI** and a **server function** to validate the PIN and track the currently signed-in firefighter.
+
+**Usage**
+
+```r
+library(shiny)
+library(shinyalert)
+
+# Make sure app_data is loaded in .pkg_env$app_data
+
+ui <- fluidPage(
+  actionButton("open_modal", "Sign In")
+)
+
+server <- function(input, output, session) {
+
+  # Open modal when button is clicked
+  observeEvent(input$open_modal, {
+    IdentifyFirefighterModal(session$ns)
+  })
+
+  # Module server for PIN validation
+  IdentifyFirefighterServer(input, output, session)
+}
+
+shinyApp(ui, server)
+```
+How it works
+
+1. Opens a modal with a dropdown of active firefighters and a PIN input field.
+
+2. On submit, validates the entered PIN against .pkg_env\$app_data\$Firefighter_Pin.
+
+3. If correct, stores the signed-in firefighter in .pkg_env\$app_data\$Current_User and shows a success notification.
+
+4. If incorrect, displays a warning using shinyalert.
+
 ### Data Transformation
 
 #### `BuildNamedVector(df, name, value, filterExpr = NULL)`
