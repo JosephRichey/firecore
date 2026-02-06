@@ -84,7 +84,7 @@ IdentifyFirefighterServer <- function(input, output, session) {
     # Compare entered PIN to the true PIN
     if (true_pin == input$input_pin) {
       # Store signed-in firefighter in the package environment
-      .pkg_env$app_data$Current_User <- IdToString(
+      app_data$Current_User <- IdToString(
         app_data$Firefighter,
         full_name,
         input$identify_firefighter
