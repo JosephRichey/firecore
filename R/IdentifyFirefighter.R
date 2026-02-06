@@ -83,12 +83,16 @@ IdentifyFirefighterServer <- function(input, output, session) {
 
     # Compare entered PIN to the true PIN
     if (true_pin == input$input_pin) {
+      # Unlock the binding before modifying
+      unlockBinding("Current_User", app_data)
       # Store signed-in firefighter in the package environment
       app_data$Current_User <- IdToString(
         app_data$Firefighter,
         full_name,
         input$identify_firefighter
       )
+      # Re-lock it after modifying (optional but good practice)
+      lockBinding("Current_User", app_data)
 
       # Show a notification of successful login
       shiny::showNotification(
