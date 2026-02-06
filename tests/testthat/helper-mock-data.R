@@ -216,6 +216,57 @@ dbExecute(
 
 .GetMockAppData <- function() {
   list(
+    Firefighter = data.frame(
+      id = 1:11,
+      full_name = c(
+        "Bill Preston",
+        "Pete Mitchell",
+        "Napolean Dynamite",
+        "Lane Meyer",
+        "Steve Rogers",
+        "Samwise Gamgee",
+        "Scott Pilgram",
+        "Angela Bennett",
+        "Thomas Anderson",
+        "George Bailey",
+        "Marty McFly"
+      ),
+      start_date = c(
+        "1989-02-17",
+        "1986-05-16",
+        "2004-06-11",
+        "1985-10-11",
+        "2011-07-22",
+        "2001-12-19",
+        "2010-08-13",
+        "1985-07-28",
+        "1999-03-31",
+        "1946-12-20",
+        "1985-07-03"
+      ),
+      trainer = c(1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 1),
+      officer = c(0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 1),
+      is_active = c(1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1),
+      company_id = c(2, 3, 1, 2, 2, 3, 1, 3, 2, 2, 3),
+      firefighter_role = c(
+        "Lieutenant",
+        "Firefighter",
+        "Chief",
+        "Probationary",
+        "Captain",
+        "Lieutenant",
+        "Assistant Chief",
+        "Firefighter",
+        "Firefighter",
+        "Firefighter",
+        "Captain"
+      ),
+      supervisor = c(5, 11, NA, 5, 3, 11, 3, 11, 5, NA, 3)
+    ),
+    Firefighter_Pin = data.frame(
+      firefighter_id = 1:11,
+      firefighter_pin = rep("0000", 11)
+    ),
     Setting = data.frame(
       id = 1:23,
       domain = c(
@@ -393,6 +444,7 @@ dbExecute(
       stringsAsFactors = FALSE
     ),
     CON = CON,
+    Current_User = NULL,
     current_local_date = Sys.time() |> with_tz('America/Denver') |> as.Date()
   )
 }

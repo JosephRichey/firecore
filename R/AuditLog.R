@@ -51,7 +51,11 @@ AuditLog <- function(userAction, session) {
   }
 
   # Extract username safely
-  username <- if (is.null(session$user)) "Unknown" else session$user
+  username <- if (is.null(app_data$Current_User)) {
+    "Unknown"
+  } else {
+    app_data$Current_User
+  }
 
   # Format current timestamp
   timestamp <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
