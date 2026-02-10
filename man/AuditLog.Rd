@@ -4,14 +4,14 @@
 \alias{AuditLog}
 \title{Log User Actions to Audit Trail}
 \usage{
-AuditLog(userAction, session)
+AuditLog(userAction, currentUser)
 }
 \arguments{
 \item{userAction}{A character string describing the action performed by
 the user (e.g., "Viewed patient record", "Modified data", "Logged in").}
 
-\item{session}{A Shiny session object containing user authentication
-information. The username is extracted from \code{session$user}.}
+\item{currentUser}{A reactiveVal or reactiveValues object containing the
+current user's name. If NULL or empty, logs as "Unknown".}
 }
 \value{
 Invisibly returns the number of rows affected (typically 1 on success).
@@ -19,12 +19,13 @@ Invisibly returns the number of rows affected (typically 1 on success).
 \description{
 Records user actions to the audit_log database table with timestamp and
 username information. Used for compliance, security monitoring, and
-activity tracking.
+activity tracking. Username comes from the currentUser reactive passed
+from the IdentifyFirefighter module.
 }
 \details{
 The function logs three pieces of information:
 \itemize{
-\item Username: Extracted from \code{session$user}, or "Unknown" if NULL
+\item Username: Extracted from \code{currentUser()}, or "Unknown" if NULL
 \item Timestamp: Current system time in "YYYY-MM-DD HH:MM:SS" format
 \item User action: The description provided in \code{userAction}
 }
@@ -35,14 +36,17 @@ SQL injection attacks. The database connection is accessed via
 }
 \examples{
 \dontrun{
+# Create reactive user
+currentUser <- reactiveVal("John Doe")
+
 # Log a patient record view
-AuditLog("Viewed patient record #12345", session)
+AuditLog("Viewed patient record #12345", currentUser)
 
 # Log a data modification
-AuditLog("Updated patient demographics", session)
+AuditLog("Updated patient demographics", currentUser)
 
 # Log a login event
-AuditLog("User logged in", session)
+AuditLog("User logged in", currentUser)
 }
 
 }

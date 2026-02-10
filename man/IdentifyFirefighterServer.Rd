@@ -4,7 +4,7 @@
 \alias{IdentifyFirefighterServer}
 \title{Identify Firefighter Server (Server Logic)}
 \usage{
-IdentifyFirefighterServer(input, output, session)
+IdentifyFirefighterServer(input, output, session, currentUser)
 }
 \arguments{
 \item{input}{Shiny module input object}
@@ -12,16 +12,19 @@ IdentifyFirefighterServer(input, output, session)
 \item{output}{Shiny module output object}
 
 \item{session}{Shiny module session object}
+
+\item{currentUser}{A reactiveVal or reactiveValues object to store the
+current user. Should be passed from parent module/app.}
 }
 \value{
-None; updates reactive environment and displays notifications
+None; updates reactive \code{currentUser} and displays notifications
 }
 \description{
 Handles the PIN validation logic for a firefighter logging in. When the
 submit button is pressed, this module:
 \enumerate{
 \item Checks the entered PIN against the stored firefighter PIN.
-\item If correct, sets \code{.pkg_env$app_data$Current_User} to the firefighter's name
+\item If correct, sets the reactive \code{currentUser} to the firefighter's info
 and shows a success notification.
 \item If incorrect, shows a warning alert.
 }
@@ -29,6 +32,7 @@ and shows a success notification.
 \examples{
 \dontrun{
 # inside a module server
-IdentifyFirefighterServer(input, output, session)
+currentUser <- reactiveVal(NULL)
+IdentifyFirefighterServer(input, output, session, currentUser)
 }
 }

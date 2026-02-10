@@ -53,21 +53,24 @@ IdentifyFirefighterModal <- function(ns) {
 #' Handles the PIN validation logic for a firefighter logging in. When the
 #' submit button is pressed, this module:
 #'   1. Checks the entered PIN against the stored firefighter PIN.
-#'   2. If correct, sets `.pkg_env$app_data$Current_User` to the firefighter's name
+#'   2. If correct, sets the reactive `currentUser` to the firefighter's info
 #'      and shows a success notification.
 #'   3. If incorrect, shows a warning alert.
 #'
 #' @param input Shiny module input object
 #' @param output Shiny module output object
 #' @param session Shiny module session object
-#' @return None; updates reactive environment and displays notifications
+#' @param currentUser A reactiveVal or reactiveValues object to store the
+#'   current user. Should be passed from parent module/app.
+#' @return None; updates reactive `currentUser` and displays notifications
 #' @examples
 #' \dontrun{
 #' # inside a module server
-#' IdentifyFirefighterServer(input, output, session)
+#' currentUser <- reactiveVal(NULL)
+#' IdentifyFirefighterServer(input, output, session, currentUser)
 #' }
 #' @export
-IdentifyFirefighterServer <- function(input, output, session) {
+IdentifyFirefighterServer <- function(input, output, session, currentUser) {
   shiny::observe({
     .CheckPackageEnv() # Ensure package environment is loaded
     app_data <- .pkg_env$app_data
@@ -82,24 +85,20 @@ IdentifyFirefighterServer <- function(input, output, session) {
       dplyr::pull(firefighter_pin)
 
     # Compare entered PIN to the true PIN
-    if (true_pin == input$input_pin) {
-      # Unlock the binding before modifying
-      unlockBinding("Current_User", app_data)
-      # Store signed-in firefighter in the package environment
-      app_data$Current_User <- IdToString(
+    if (length(true_pin) > 0 && true_pin == input$input_pin) {
+      # Get the firefighter's name
+      firefighter_name <- IdToString(
         app_data$Firefighter,
         full_name,
         input$identify_firefighter
       )
-      # Re-lock it after modifying (optional but good practice)
-      lockBinding("Current_User", app_data)
+
+      # Update the reactive value
+      currentUser(firefighter_name)
 
       # Show a notification of successful login
       shiny::showNotification(
-        paste(
-          .pkg_env$app_data$Current_User,
-          "is signed in"
-        ),
+        paste(firefighter_name, "is signed in"),
         duration = 5
       )
 
