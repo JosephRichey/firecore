@@ -43,7 +43,11 @@ IdentifyFirefighterModal <- function(ns) {
       title = "Sign In",
       # Submit button
       footer = shiny::tagList(
-        shiny::actionButton(ns("submit_id_pin"), "Submit")
+        shiny::actionButton(
+          ns("submit_id_pin"),
+          "Submit",
+          class = 'btn btn-primary'
+        )
       )
     )
   )
