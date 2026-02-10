@@ -129,7 +129,7 @@ IdentifyFirefighterServer <- function(id, current_user, show_on_load = TRUE) {
         )
 
         current_user(firefighter_name)
-        log_success(
+        logger::log_success(
           glue::glue("{firefighter_name} logged in"),
           namespace = "IdentifyFirefighterServer"
         )
@@ -141,7 +141,7 @@ IdentifyFirefighterServer <- function(id, current_user, show_on_load = TRUE) {
 
         shiny::removeModal()
       } else {
-        log_warning(
+        logger::log_warning(
           glue::glue(
             "Invalid sign in attempt. Name: {firefighter_name}, Pin: {input$input_pin}"
           ),
