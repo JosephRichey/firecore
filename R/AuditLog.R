@@ -51,13 +51,13 @@ AuditLog <- function(userAction, current_user) {
   } else {
     "Unknown"
   }
-  
+
   cat("\n=== AuditLog Debug ===\n")
   cat("Called from:", caller, "\n")
   cat("userAction class:", class(userAction), "\n")
   cat("userAction length:", length(userAction), "\n")
   cat("userAction is.character:", is.character(userAction), "\n")
-  cat("userAction value:", substr(as.character(userAction), 1, 100), "\n")  # First 100 chars
+  cat("userAction value:", substr(as.character(userAction), 1, 100), "\n") # First 100 chars
   cat("current_user class:", class(current_user), "\n")
   if (shiny::is.reactive(current_user)) {
     cat("current_user is reactive, value:", current_user(), "\n")
@@ -72,9 +72,6 @@ AuditLog <- function(userAction, current_user) {
     cat("Stopping with error\n\n")
     stop("'userAction' must be a single character string")
   }
-  
-  # Rest of function...
-}
 
   # Extract username safely from reactive
   username <- tryCatch(
