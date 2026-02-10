@@ -14,12 +14,17 @@ Displays a modal dialog with firefighter selection and PIN input.
 }
 \description{
 Displays a modal dialog for a firefighter to "sign in" by selecting their name
-from a dropdown and entering their unique PIN. Intended to be used within a
-Shiny module system; the input IDs are namespaced via \code{ns}.
+from a dropdown and entering their unique PIN. This function is intended to be
+called from within the IdentifyFirefighterServer module to ensure proper
+namespace consistency.
+}
+\note{
+This function is typically not called directly by users. It is called
+internally by IdentifyFirefighterServer when show_on_load = TRUE.
 }
 \examples{
 \dontrun{
-# inside a module server
+# Called from inside a module server
 IdentifyFirefighterModal(session$ns)
 }
 }

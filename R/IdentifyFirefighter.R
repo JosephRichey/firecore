@@ -1,14 +1,17 @@
 #' Identify Firefighter Modal (UI)
 #'
 #' Displays a modal dialog for a firefighter to "sign in" by selecting their name
-#' from a dropdown and entering their unique PIN. Intended to be used within a
-#' Shiny module system; the input IDs are namespaced via `ns`.
+#' from a dropdown and entering their unique PIN. This function is intended to be
+#' called from within the IdentifyFirefighterServer module to ensure proper
+#' namespace consistency.
 #'
 #' @param ns The namespace function from a Shiny module session (`session$ns`)
 #' @return Displays a modal dialog with firefighter selection and PIN input.
+#' @note This function is typically not called directly by users. It is called
+#'   internally by IdentifyFirefighterServer when show_on_load = TRUE.
 #' @examples
 #' \dontrun{
-#' # inside a module server
+#' # Called from inside a module server
 #' IdentifyFirefighterModal(session$ns)
 #' }
 IdentifyFirefighterModal <- function(ns) {
@@ -49,30 +52,58 @@ IdentifyFirefighterModal <- function(ns) {
 
 #' Identify Firefighter Server (Server Logic)
 #'
-#' Handles the PIN validation logic for a firefighter logging in. When the
-#' submit button is pressed, this module:
-#'   1. Checks the entered PIN against the stored firefighter PIN.
-#'   2. If correct, sets the reactive `currentUser` to the firefighter's info
-#'      and shows a success notification.
-#'   3. If incorrect, shows a warning alert.
+#' A Shiny module that handles firefighter authentication via PIN validation.
+#' This module displays a modal dialog for firefighters to sign in and validates
+#' their credentials. The modal can be shown automatically on module load or
+#' triggered manually.
 #'
-#' @param id The namespace ID for the Shiny module
-#' @param currentUser A reactiveVal or reactiveValues object to store the
-#'   current user. Should be passed from parent module/app.
-#' @return None; updates reactive `currentUser` and displays notifications
+#' When the submit button is pressed, this module:
+#'   1. Checks the entered PIN against the stored firefighter PIN in the database.
+#'   2. If correct, sets the reactive `current_user` to the firefighter's name
+#'      and shows a success notification.
+#'   3. If incorrect, shows a warning alert allowing retry.
+#'
+#' @param id The namespace ID for the Shiny module (e.g., "identify_firefighter")
+#' @param current_user A reactiveVal containing the current user's name. Should
+#'   be created in the parent scope and passed to this module. The module will
+#'   update this value upon successful authentication.
+#' @param show_on_load Logical. If TRUE (default), the identification modal will
+#'   be displayed automatically when the module loads and current_user is NULL.
+#'   Set to FALSE if you want to trigger the modal manually.
+#'
+#' @return None; side effects include updating the reactive `current_user` value
+#'   and displaying notifications/modals.
+#'
 #' @examples
 #' \dontrun{
-#' # inside a module server
-#' currentUser <- reactiveVal(NULL)
-#' IdentifyFirefighterServer(input, output, session, currentUser)
+#' # In your main server function
+#' server <- function(input, output, session) {
+#'   # Create reactive to store current user
+#'   current_user <- reactiveVal(NULL)
+#'
+#'   # Initialize the identification module
+#'   # Modal shows automatically on app load
+#'   IdentifyFirefighterServer("identify_firefighter", current_user)
+#'
+#'   # Use current_user elsewhere in your app
+#'   observe({
+#'     req(current_user())
+#'     print(paste("Current user:", current_user()))
+#'   })
 #' }
+#'
+#' # To trigger modal manually (show_on_load = FALSE)
+#' IdentifyFirefighterServer("identify_firefighter", current_user, show_on_load = FALSE)
+#' # Then trigger with: IdentifyFirefighterModal(session$ns) when needed
+#' }
+#'
 #' @export
 IdentifyFirefighterServer <- function(id, current_user, show_on_load = TRUE) {
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
     # Show modal on module load if requested
     if (show_on_load) {
-      observe({
-        req(is.null(current_user()))
+      shiny::observe({
+        shiny::req(is.null(current_user()))
         IdentifyFirefighterModal(session$ns)
       })
     }

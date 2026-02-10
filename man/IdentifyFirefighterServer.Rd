@@ -4,35 +4,59 @@
 \alias{IdentifyFirefighterServer}
 \title{Identify Firefighter Server (Server Logic)}
 \usage{
-IdentifyFirefighterServer(input, output, session, currentUser)
+IdentifyFirefighterServer(id, current_user, show_on_load = TRUE)
 }
 \arguments{
-\item{input}{Shiny module input object}
+\item{id}{The namespace ID for the Shiny module (e.g., "identify_firefighter")}
 
-\item{output}{Shiny module output object}
+\item{current_user}{A reactiveVal containing the current user's name. Should
+be created in the parent scope and passed to this module. The module will
+update this value upon successful authentication.}
 
-\item{session}{Shiny module session object}
-
-\item{currentUser}{A reactiveVal or reactiveValues object to store the
-current user. Should be passed from parent module/app.}
+\item{show_on_load}{Logical. If TRUE (default), the identification modal will
+be displayed automatically when the module loads and current_user is NULL.
+Set to FALSE if you want to trigger the modal manually.}
 }
 \value{
-None; updates reactive \code{currentUser} and displays notifications
+None; side effects include updating the reactive \code{current_user} value
+and displaying notifications/modals.
 }
 \description{
-Handles the PIN validation logic for a firefighter logging in. When the
-submit button is pressed, this module:
+A Shiny module that handles firefighter authentication via PIN validation.
+This module displays a modal dialog for firefighters to sign in and validates
+their credentials. The modal can be shown automatically on module load or
+triggered manually.
+}
+\details{
+When the submit button is pressed, this module:
 \enumerate{
-\item Checks the entered PIN against the stored firefighter PIN.
-\item If correct, sets the reactive \code{currentUser} to the firefighter's info
+\item Checks the entered PIN against the stored firefighter PIN in the database.
+\item If correct, sets the reactive \code{current_user} to the firefighter's name
 and shows a success notification.
-\item If incorrect, shows a warning alert.
+\item If incorrect, shows a warning alert allowing retry.
 }
 }
 \examples{
 \dontrun{
-# inside a module server
-currentUser <- reactiveVal(NULL)
-IdentifyFirefighterServer(input, output, session, currentUser)
+# In your main server function
+server <- function(input, output, session) {
+  # Create reactive to store current user
+  current_user <- reactiveVal(NULL)
+
+  # Initialize the identification module
+  # Modal shows automatically on app load
+  IdentifyFirefighterServer("identify_firefighter", current_user)
+
+  # Use current_user elsewhere in your app
+  observe({
+    req(current_user())
+    print(paste("Current user:", current_user()))
+  })
 }
+
+# To trigger modal manually (show_on_load = FALSE)
+IdentifyFirefighterServer("identify_firefighter", current_user, show_on_load = FALSE)
+# Then trigger with: IdentifyFirefighterModal(session$ns) when needed
+}
+
 }
