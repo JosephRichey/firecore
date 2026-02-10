@@ -11,7 +11,6 @@
 #' # inside a module server
 #' IdentifyFirefighterModal(session$ns)
 #' }
-#' @export
 IdentifyFirefighterModal <- function(ns) {
   .CheckPackageEnv() # Ensure package environment is loaded
   app_data <- .pkg_env$app_data
@@ -68,8 +67,17 @@ IdentifyFirefighterModal <- function(ns) {
 #' IdentifyFirefighterServer(input, output, session, currentUser)
 #' }
 #' @export
-IdentifyFirefighterServer <- function(id, currentUser) {
+IdentifyFirefighterServer <- function(id, current_user, show_on_load = TRUE) {
   moduleServer(id, function(input, output, session) {
+    # Show modal on module load if requested
+    if (show_on_load) {
+      observe({
+        req(is.null(current_user()))
+        IdentifyFirefighterModal(session$ns)
+      })
+    }
+
+    # Handle submission
     shiny::observe({
       .CheckPackageEnv()
       app_data <- .pkg_env$app_data
@@ -89,7 +97,7 @@ IdentifyFirefighterServer <- function(id, currentUser) {
           input$identify_firefighter
         )
 
-        currentUser(firefighter_name)
+        current_user(firefighter_name)
 
         shiny::showNotification(
           paste(firefighter_name, "is signed in"),
