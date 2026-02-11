@@ -40,7 +40,7 @@
 #' }
 #'
 #' @export
-AuditLog <- function(userAction, current_user) {
+AuditLog <- function(userAction, currentUser) {
   .CheckPackageEnv()
   app_data <- .pkg_env$app_data
 
@@ -58,11 +58,11 @@ AuditLog <- function(userAction, current_user) {
   cat("userAction length:", length(userAction), "\n")
   cat("userAction is.character:", is.character(userAction), "\n")
   cat("userAction value:", substr(as.character(userAction), 1, 100), "\n") # First 100 chars
-  cat("current_user class:", class(current_user), "\n")
-  if (shiny::is.reactive(current_user)) {
-    cat("current_user is reactive, value:", current_user(), "\n")
+  cat("current_user class:", class(currentUser), "\n")
+  if (shiny::is.reactive(currentUser)) {
+    cat("current_user is reactive, value:", currentUser(), "\n")
   } else {
-    cat("current_user value:", current_user, "\n")
+    cat("current_user value:", currentUser, "\n")
   }
   cat("=====================\n\n")
 

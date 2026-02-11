@@ -7,10 +7,10 @@ library(DBI)
 library(RSQLite)
 
 # Create in-memory database
-CON <- dbConnect(SQLite(), ":memory:")
+CON <- DBI::dbConnect(RSQLite::SQLite(), ":memory:")
 
 # === AUDIT LOG TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE audit_log (
@@ -23,7 +23,7 @@ dbExecute(
 )
 
 # === TRAINING TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE training (
@@ -35,7 +35,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO training VALUES 
@@ -45,7 +45,7 @@ dbExecute(
 )
 
 # === FIREFIGHTER TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE firefighter (
@@ -57,7 +57,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO firefighter VALUES 
@@ -68,7 +68,7 @@ dbExecute(
 )
 
 # === ATTENDANCE TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE attendance (
@@ -80,7 +80,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO attendance VALUES 
@@ -90,7 +90,7 @@ dbExecute(
 )
 
 # === FIREFIGHTER_RESPONSE TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE firefighter_response (
@@ -102,7 +102,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO firefighter_response VALUES 
@@ -113,7 +113,7 @@ dbExecute(
 )
 
 # === PATIENTS TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE patients (
@@ -124,7 +124,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO patients (id, name, age) VALUES 
@@ -135,7 +135,7 @@ dbExecute(
 )
 
 # === MEDICATIONS TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE medications (
@@ -146,7 +146,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO medications (id, drug_name, dosage) VALUES 
@@ -156,7 +156,7 @@ dbExecute(
 )
 
 # === EMPTY TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE empty_table (
@@ -167,7 +167,7 @@ dbExecute(
 )
 
 # === TEST_TABLE_123 ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE test_table_123 (
@@ -177,7 +177,7 @@ dbExecute(
 )
 
 # === MAIN.TEST_SCHEMA_TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE main.test_schema_table (
@@ -187,7 +187,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO main.test_schema_table VALUES 
@@ -196,7 +196,7 @@ dbExecute(
 )
 
 # === UNKNOWN_TABLE ===
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   CREATE TABLE unknown_table (
@@ -206,7 +206,7 @@ dbExecute(
   "
 )
 
-dbExecute(
+DBI::dbExecute(
   CON,
   "
   INSERT INTO unknown_table VALUES 
@@ -445,7 +445,9 @@ dbExecute(
     ),
     CON = CON,
     Current_User = NULL,
-    current_local_date = Sys.time() |> with_tz('America/Denver') |> as.Date()
+    current_local_date = Sys.time() |>
+      lubridate::with_tz('America/Denver') |>
+      as.Date()
   )
 }
 
