@@ -44,33 +44,6 @@ AuditLog <- function(userAction, currentUser) {
   .CheckPackageEnv()
   app_data <- .pkg_env$app_data
 
-  # Force evaluation of glue objects FIRST, before any other checks
-  if (inherits(userAction, "glue")) {
-    userAction <- as.character(userAction)
-  }
-
-  # DEBUG - Get call stack to see where this is being called from
-  call_stack <- sys.calls()
-  caller <- if (length(call_stack) >= 2) {
-    deparse(call_stack[[length(call_stack) - 1]])[1]
-  } else {
-    "Unknown"
-  }
-
-  cat("\n=== AuditLog Debug ===\n")
-  cat("Called from:", caller, "\n")
-  cat("userAction class:", class(userAction), "\n")
-  cat("userAction length:", length(userAction), "\n")
-  cat("userAction is.character:", is.character(userAction), "\n")
-  cat("userAction value:", substr(as.character(userAction), 1, 100), "\n") # First 100 chars
-  cat("current_user class:", class(currentUser), "\n")
-  if (shiny::is.reactive(currentUser)) {
-    cat("current_user is reactive, value:", currentUser(), "\n")
-  } else {
-    cat("current_user value:", currentUser, "\n")
-  }
-  cat("=====================\n\n")
-
   # Validate inputs
   if (!is.character(userAction) || length(userAction) != 1) {
     cat("\n!!! VALIDATION FAILED !!!\n")
