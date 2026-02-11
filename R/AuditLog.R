@@ -44,6 +44,11 @@ AuditLog <- function(userAction, currentUser) {
   .CheckPackageEnv()
   app_data <- .pkg_env$app_data
 
+  # Force evaluation of glue objects FIRST, before any other checks
+  if (inherits(userAction, "glue")) {
+    userAction <- as.character(userAction)
+  }
+
   # DEBUG - Get call stack to see where this is being called from
   call_stack <- sys.calls()
   caller <- if (length(call_stack) >= 2) {
