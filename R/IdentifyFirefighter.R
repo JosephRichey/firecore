@@ -146,13 +146,13 @@ IdentifyFirefighterServer <- function(
         dplyr::filter(id == input$identify_firefighter) |>
         dplyr::pull(firefighter_pin)
 
-      if (length(true_pin) > 0 && true_pin == input$input_pin) {
-        firefighter_name <- IdToString(
-          app_data$Firefighter,
-          full_name,
-          input$identify_firefighter
-        )
+      firefighter_name <- IdToString(
+        app_data$Firefighter,
+        full_name,
+        input$identify_firefighter
+      )
 
+      if (length(true_pin) > 0 && true_pin == input$input_pin) {
         current_user(firefighter_name)
         logger::log_success(
           glue::glue("{firefighter_name} logged in"),
