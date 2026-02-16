@@ -4,7 +4,12 @@
 \alias{IdentifyFirefighterServer}
 \title{Identify Firefighter Server (Server Logic)}
 \usage{
-IdentifyFirefighterServer(id, current_user, show_on_load = TRUE)
+IdentifyFirefighterServer(
+  id,
+  current_user,
+  show_on_load = TRUE,
+  officer_filter = FALSE
+)
 }
 \arguments{
 \item{id}{The namespace ID for the Shiny module (e.g., "identify_firefighter")}
@@ -16,6 +21,10 @@ update this value upon successful authentication.}
 \item{show_on_load}{Logical. If TRUE (default), the identification modal will
 be displayed automatically when the module loads and current_user is NULL.
 Set to FALSE if you want to trigger the modal manually.}
+
+\item{officer_filter}{Logical. If TRUE, only officers will be shown in the
+firefighter dropdown. If FALSE (default), all active firefighters are shown.
+This is useful for restricting certain actions to department leadership.}
 }
 \value{
 None; side effects include updating the reactive \code{current_user} value
@@ -47,6 +56,9 @@ server <- function(input, output, session) {
   # Modal shows automatically on app load
   IdentifyFirefighterServer("identify_firefighter", current_user)
 
+  # Restrict to officers only
+  IdentifyFirefighterServer("officer_action", current_user, officer_filter = TRUE)
+
   # Use current_user elsewhere in your app
   observe({
     req(current_user())
@@ -56,7 +68,7 @@ server <- function(input, output, session) {
 
 # To trigger modal manually (show_on_load = FALSE)
 IdentifyFirefighterServer("identify_firefighter", current_user, show_on_load = FALSE)
-# Then trigger with: IdentifyFirefighterModal(session$ns) when needed
+# Then trigger with: IdentifyFirefighterModal(session$ns, officer_filter = FALSE) when needed
 }
 
 }

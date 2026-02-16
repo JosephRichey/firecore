@@ -4,10 +4,13 @@
 \alias{IdentifyFirefighterModal}
 \title{Identify Firefighter Modal (UI)}
 \usage{
-IdentifyFirefighterModal(ns)
+IdentifyFirefighterModal(ns, officer_filter)
 }
 \arguments{
 \item{ns}{The namespace function from a Shiny module session (\code{session$ns})}
+
+\item{officer_filter}{Logical. If TRUE, only officers will be shown in the
+firefighter dropdown. If FALSE (default), all active firefighters are shown.}
 }
 \value{
 Displays a modal dialog with firefighter selection and PIN input.
@@ -25,6 +28,6 @@ internally by IdentifyFirefighterServer when show_on_load = TRUE.
 \examples{
 \dontrun{
 # Called from inside a module server
-IdentifyFirefighterModal(session$ns)
+IdentifyFirefighterModal(session$ns, officer_filter = FALSE)
 }
 }

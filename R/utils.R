@@ -42,7 +42,8 @@ utils::globalVariables(c(
   "full_name",
   "is_active",
   "id",
-  "firefighter_pin"
+  "firefighter_pin",
+  "officer"
 ))
 
 # Note: is.POSIXct and is.POSIXlt should be prefixed with lubridate::

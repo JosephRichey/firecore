@@ -6,13 +6,15 @@
 #' namespace consistency.
 #'
 #' @param ns The namespace function from a Shiny module session (`session$ns`)
+#' @param officer_filter Logical. If TRUE, only officers will be shown in the
+#'   firefighter dropdown. If FALSE (default), all active firefighters are shown.
 #' @return Displays a modal dialog with firefighter selection and PIN input.
 #' @note This function is typically not called directly by users. It is called
 #'   internally by IdentifyFirefighterServer when show_on_load = TRUE.
 #' @examples
 #' \dontrun{
 #' # Called from inside a module server
-#' IdentifyFirefighterModal(session$ns)
+#' IdentifyFirefighterModal(session$ns, officer_filter = FALSE)
 #' }
 IdentifyFirefighterModal <- function(ns, officer_filter) {
   .CheckPackageEnv() # Ensure package environment is loaded
@@ -82,6 +84,9 @@ IdentifyFirefighterModal <- function(ns, officer_filter) {
 #' @param show_on_load Logical. If TRUE (default), the identification modal will
 #'   be displayed automatically when the module loads and current_user is NULL.
 #'   Set to FALSE if you want to trigger the modal manually.
+#' @param officer_filter Logical. If TRUE, only officers will be shown in the
+#'   firefighter dropdown. If FALSE (default), all active firefighters are shown.
+#'   This is useful for restricting certain actions to department leadership.
 #'
 #' @return None; side effects include updating the reactive `current_user` value
 #'   and displaying notifications/modals.
@@ -97,6 +102,9 @@ IdentifyFirefighterModal <- function(ns, officer_filter) {
 #'   # Modal shows automatically on app load
 #'   IdentifyFirefighterServer("identify_firefighter", current_user)
 #'
+#'   # Restrict to officers only
+#'   IdentifyFirefighterServer("officer_action", current_user, officer_filter = TRUE)
+#'
 #'   # Use current_user elsewhere in your app
 #'   observe({
 #'     req(current_user())
@@ -106,7 +114,7 @@ IdentifyFirefighterModal <- function(ns, officer_filter) {
 #'
 #' # To trigger modal manually (show_on_load = FALSE)
 #' IdentifyFirefighterServer("identify_firefighter", current_user, show_on_load = FALSE)
-#' # Then trigger with: IdentifyFirefighterModal(session$ns) when needed
+#' # Then trigger with: IdentifyFirefighterModal(session$ns, officer_filter = FALSE) when needed
 #' }
 #'
 #' @export
