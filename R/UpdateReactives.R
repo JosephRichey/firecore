@@ -162,6 +162,9 @@ UpdateReactives <- function(rdfs, dbTableName = NULL) {
             input = 'datetime',
             output = 'datetime'
           )
+        ) |>
+        dplyr::filter(
+          is.na(is_deleted)
         ),
 
       # Incident table - convert incident_start and incident_end to local time
@@ -177,6 +180,9 @@ UpdateReactives <- function(rdfs, dbTableName = NULL) {
             input = 'datetime',
             output = 'datetime'
           )
+        ) |>
+        dplyr::filter(
+          is.na(is_deleted)
         ),
 
       # Firefighter table - convert start_date and sort by display order
