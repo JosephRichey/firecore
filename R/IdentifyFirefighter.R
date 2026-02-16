@@ -14,9 +14,17 @@
 #' # Called from inside a module server
 #' IdentifyFirefighterModal(session$ns)
 #' }
-IdentifyFirefighterModal <- function(ns) {
+IdentifyFirefighterModal <- function(ns, officer_filter) {
   .CheckPackageEnv() # Ensure package environment is loaded
   app_data <- .pkg_env$app_data
+
+  # Should you filter to only officers?
+  if (officer_filter) {
+    Firefighter <- app_data$Firefighter |>
+      dplyr::filter(officer == 1)
+  } else {
+    Firefighter <- app_data$Firefighter
+  }
 
   shiny::showModal(
     shiny::modalDialog(
@@ -25,7 +33,7 @@ IdentifyFirefighterModal <- function(ns) {
         ns('identify_firefighter'),
         label = '',
         choices = BuildNamedVector(
-          df = app_data$Firefighter,
+          df = Firefighter,
           name = full_name,
           value = id,
           filterExpr = is_active == TRUE # Only show active firefighters
@@ -102,13 +110,18 @@ IdentifyFirefighterModal <- function(ns) {
 #' }
 #'
 #' @export
-IdentifyFirefighterServer <- function(id, current_user, show_on_load = TRUE) {
+IdentifyFirefighterServer <- function(
+  id,
+  current_user,
+  show_on_load = TRUE,
+  officer_filter = FALSE
+) {
   shiny::moduleServer(id, function(input, output, session) {
     # Show modal on module load if requested
     if (show_on_load) {
       shiny::observe({
         shiny::req(is.null(current_user()))
-        IdentifyFirefighterModal(session$ns)
+        IdentifyFirefighterModal(session$ns, officer_filter)
       })
     }
 
