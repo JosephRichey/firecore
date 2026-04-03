@@ -19,6 +19,7 @@ Imports:
     dplyr,
     glue,
     hms,
+    httr2,
     logger,
     lubridate,
     rlang,

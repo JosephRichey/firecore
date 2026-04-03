@@ -56,24 +56,24 @@ GenerateThreshold <- function(
     stop("'expireCalc' must be TRUE or FALSE")
   }
 
-  # Calculate threshold date
+  # Calculate threshold date.
+  # leadTimeUnit is a scalar string so if/else is correct here —
+  # case_when is not appropriate when the LHS is scalar and RHS is vectorized.
   if (expireCalc) {
-    # Add lead time for expiration calculations
-    result <- dplyr::case_when(
-      leadTimeUnit == "day" ~ date + lubridate::days(leadTime),
-      leadTimeUnit == "month" ~ date |> lubridate::`%m+%`(months(leadTime)),
-      leadTimeUnit == "year" ~ date |>
-        lubridate::`%m+%`(lubridate::years(leadTime))
-    )
+    if (leadTimeUnit == "day") {
+      date + lubridate::days(leadTime)
+    } else if (leadTimeUnit == "month") {
+      lubridate::`%m+%`(date, months(leadTime))
+    } else {
+      lubridate::`%m+%`(date, lubridate::years(leadTime))
+    }
   } else {
-    # Subtract lead time for lookback calculations
-    result <- dplyr::case_when(
-      leadTimeUnit == "day" ~ date - lubridate::days(leadTime),
-      leadTimeUnit == "month" ~ date |> lubridate::`%m-%`(months(leadTime)),
-      leadTimeUnit == "year" ~ date |>
-        lubridate::`%m-%`(lubridate::years(leadTime))
-    )
+    if (leadTimeUnit == "day") {
+      date - lubridate::days(leadTime)
+    } else if (leadTimeUnit == "month") {
+      lubridate::`%m-%`(date, months(leadTime))
+    } else {
+      lubridate::`%m-%`(date, lubridate::years(leadTime))
+    }
   }
-
-  return(result)
 }
