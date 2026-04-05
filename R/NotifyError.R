@@ -35,6 +35,8 @@
 #' The \code{ERROR_EMAIL} environment variable must be set for emails to send.
 #' If it is missing, a warning is logged and no email is sent -- the function
 #' still logs the error at the \code{log_error} level regardless.
+#' Additionally, \code{FIRE_DEPARTMENT} and \code{APPLICATION} need to be set to
+#' have the email sent with complete details.
 #'
 #' @seealso \code{\link{SendEmail}} for general-purpose email sending.
 #' @seealso \code{\link{DbExecuteAudited}} which calls this on database errors.
@@ -115,6 +117,14 @@ NotifyError <- function(message, context = "", current_user = NULL) {
     '
     <h2 style="color:#c0392b;">FirePulse Application Error</h2>
     <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
+        <tr>
+        <td style="padding:4px 12px 4px 0;font-weight:bold;">Fire Department</td>
+        <td>{Sys.getenv("FIRE_DEPARTMENT")}</td>
+      </tr>
+      <tr>
+        <td style="padding:4px 12px 4px 0;font-weight:bold;">App</td>
+        <td>{Sys.getenv("APPLICATION")}</td>
+      </tr>
       <tr>
         <td style="padding:4px 12px 4px 0;font-weight:bold;">Context</td>
         <td>{if (nzchar(context)) context else "Not specified"}</td>

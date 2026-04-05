@@ -46,6 +46,8 @@ read from the \code{ERROR_EMAIL} environment variable. The email includes:
 The \code{ERROR_EMAIL} environment variable must be set for emails to send.
 If it is missing, a warning is logged and no email is sent -- the function
 still logs the error at the \code{log_error} level regardless.
+Additionally, \code{FIRE_DEPARTMENT} and \code{APPLICATION} need to be set to
+have the email sent with complete details.
 }
 \examples{
 \dontrun{
