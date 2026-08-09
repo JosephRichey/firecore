@@ -206,6 +206,39 @@ UpdateReactives <- function(rdfs, dbTableName = NULL) {
           )
         ),
 
+      "equipment" = df |>
+        dplyr::mutate(
+          next_check_date = ConvertToLocalPosix(
+            next_check_date,
+            input = 'date',
+            output = 'date'
+          ),
+          expiration_date = ConvertToLocalPosix(
+            expiration_date,
+            input = 'date',
+            output = 'date'
+          ),
+          snooze_expires = ConvertToLocalPosix(
+            snooze_expires,
+            input = 'date',
+            output = 'date'
+          )
+        ),
+
+      "equipment_log" = df |>
+        dplyr::mutate(
+          check_date_time = ConvertToLocalPosix(
+            check_date_time,
+            input = 'datetime',
+            output = 'datetime'
+          ),
+          reviewed_at = ConvertToLocalPosix(
+            reviewed_at,
+            input = 'datetime',
+            output = 'datetime'
+          )
+        ),
+
       # Default case - no transformation needed
       df
     )
