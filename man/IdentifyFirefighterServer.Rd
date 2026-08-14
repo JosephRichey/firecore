@@ -8,7 +8,9 @@ IdentifyFirefighterServer(
   id,
   current_user,
   show_on_load = TRUE,
-  officer_filter = FALSE
+  officer_filter = FALSE,
+  use_pin = TRUE,
+  cookie_config = NULL
 )
 }
 \arguments{
@@ -23,8 +25,13 @@ be displayed automatically when the module loads and current_user is NULL.
 Set to FALSE if you want to trigger the modal manually.}
 
 \item{officer_filter}{Logical. If TRUE, only officers will be shown in the
-firefighter dropdown. If FALSE (default), all active firefighters are shown.
-This is useful for restricting certain actions to department leadership.}
+firefighter dropdown. If FALSE (default), all active firefighters are shown.}
+
+\item{use_pin}{Logical. If TRUE (default), require a PIN. If FALSE, the
+modal is a firefighter selection confirmation.}
+
+\item{cookie_config}{A configuration created by \code{\link[=NewAuthCookieConfig]{NewAuthCookieConfig()}}. When
+supplied, the browser cookie is checked before the sign-in modal is shown.}
 }
 \value{
 None; side effects include updating the reactive \code{current_user} value

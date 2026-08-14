@@ -8,6 +8,8 @@
 #' @param ns The namespace function from a Shiny module session (`session$ns`)
 #' @param officer_filter Logical. If TRUE, only officers will be shown in the
 #'   firefighter dropdown. If FALSE (default), all active firefighters are shown.
+#' @param use_pin Logical. If TRUE (default), display and validate a PIN. If
+#'   FALSE, use the dropdown only as a firefighter-selection confirmation.
 #' @return Displays a modal dialog with firefighter selection and PIN input.
 #' @note This function is typically not called directly by users. It is called
 #'   internally by IdentifyFirefighterServer when show_on_load = TRUE.
@@ -16,7 +18,7 @@
 #' # Called from inside a module server
 #' IdentifyFirefighterModal(session$ns, officer_filter = FALSE)
 #' }
-IdentifyFirefighterModal <- function(ns, officer_filter) {
+IdentifyFirefighterModal <- function(ns, officer_filter, use_pin = TRUE) {
   .CheckPackageEnv() # Ensure package environment is loaded
   app_data <- .pkg_env$app_data
 
@@ -28,29 +30,26 @@ IdentifyFirefighterModal <- function(ns, officer_filter) {
     Firefighter <- app_data$Firefighter
   }
 
+  choices <- BuildNamedVector(
+    df = Firefighter,
+    name = full_name,
+    value = id,
+    filterExpr = is_active == TRUE
+  )
+
+  body <- if (use_pin) {
+    shiny::tagList(
+      shiny::selectInput(ns('identify_firefighter'), '', choices = choices, selected = NULL, selectize = FALSE),
+      shiny::passwordInput(ns('input_pin'), label = "", placeholder = 'Pin')
+    )
+  } else {
+    shiny::selectInput(ns('identify_firefighter'), '', choices = c("Select Firefighter" = "", choices), selected = "", selectize = FALSE)
+  }
+
   shiny::showModal(
     shiny::modalDialog(
-      # Firefighter dropdown
-      shiny::selectInput(
-        ns('identify_firefighter'),
-        label = '',
-        choices = BuildNamedVector(
-          df = Firefighter,
-          name = full_name,
-          value = id,
-          filterExpr = is_active == TRUE # Only show active firefighters
-        ),
-        selected = NULL,
-        multiple = FALSE,
-        selectize = FALSE
-      ),
-      # PIN input field
-      shiny::passwordInput(
-        ns('input_pin'),
-        label = "",
-        placeholder = 'Pin'
-      ),
-      title = "Sign In",
+      body,
+      title = if (use_pin) "Sign In" else "Firefighter Performing Check",
       # Submit button
       footer = shiny::tagList(
         shiny::actionButton(
@@ -86,7 +85,13 @@ IdentifyFirefighterModal <- function(ns, officer_filter) {
 #'   Set to FALSE if you want to trigger the modal manually.
 #' @param officer_filter Logical. If TRUE, only officers will be shown in the
 #'   firefighter dropdown. If FALSE (default), all active firefighters are shown.
+#' @param use_pin Logical. If TRUE (default), display and validate a PIN. If
+#'   FALSE, use the dropdown only as a firefighter-selection confirmation.
 #'   This is useful for restricting certain actions to department leadership.
+#' @param use_pin Logical. If TRUE (default), require a PIN. If FALSE, the
+#'   modal is a firefighter selection confirmation.
+#' @param cookie_config A configuration created by [NewAuthCookieConfig()]. When
+#'   supplied, the browser cookie is checked before the sign-in modal is shown.
 #'
 #' @return None; side effects include updating the reactive `current_user` value
 #'   and displaying notifications/modals.
@@ -122,14 +127,57 @@ IdentifyFirefighterServer <- function(
   id,
   current_user,
   show_on_load = TRUE,
-  officer_filter = FALSE
+  officer_filter = FALSE,
+  use_pin = TRUE,
+  cookie_config = NULL
 ) {
   shiny::moduleServer(id, function(input, output, session) {
+    cookie_checked <- shiny::reactiveVal(is.null(cookie_config))
+
+    if (!is.null(cookie_config)) {
+      session$onFlushed(
+        function() {
+          session$sendCustomMessage(
+            "firecore-read-auth-cookie",
+            list(
+              cookie_name = cookie_config$cookie_name,
+              input_id = session$ns("auth_cookie")
+            )
+          )
+        },
+        once = TRUE
+      )
+
+      shiny::observeEvent(input$auth_cookie, {
+        user_id <- ValidateAuthCookie(input$auth_cookie, cookie_config)
+
+        if (!is.null(user_id)) {
+          .CheckPackageEnv()
+          firefighter <- .pkg_env$app_data$Firefighter
+          matching_firefighter <- firefighter[
+            as.character(firefighter$id) == user_id &
+              firefighter$is_active == TRUE,
+            ,
+            drop = FALSE
+          ]
+
+          if (nrow(matching_firefighter) == 1) {
+            current_user(matching_firefighter$full_name[[1]])
+            WriteFirefighterCookie(session, user_id, cookie_config)
+            NotifySignedInFirefighter(current_user())
+          }
+        }
+
+        cookie_checked(TRUE)
+      }, once = TRUE)
+    }
+
     # Show modal on module load if requested
     if (show_on_load) {
       shiny::observe({
+        shiny::req(cookie_checked())
         shiny::req(is.null(current_user()))
-        IdentifyFirefighterModal(session$ns, officer_filter)
+        IdentifyFirefighterModal(session$ns, officer_filter, use_pin)
       })
     }
 
@@ -152,8 +200,13 @@ IdentifyFirefighterServer <- function(
         input$identify_firefighter
       )
 
-      if (length(true_pin) > 0 && true_pin == input$input_pin) {
+      valid_login <- !is.null(input$identify_firefighter) && nzchar(input$identify_firefighter) && (!use_pin || (length(true_pin) > 0 && true_pin == input$input_pin))
+
+      if (valid_login) {
         current_user(firefighter_name)
+        if (!is.null(cookie_config)) {
+          WriteFirefighterCookie(session, input$identify_firefighter, cookie_config)
+        }
         logger::log_success(
           glue::glue("{firefighter_name} logged in"),
           namespace = "IdentifyFirefighterServer"
@@ -165,7 +218,7 @@ IdentifyFirefighterServer <- function(
         )
 
         shiny::removeModal()
-      } else {
+      } else if (use_pin) {
         logger::log_warn(
           glue::glue(
             "Invalid sign in attempt. Name: {firefighter_name}, Pin: {input$input_pin}"
@@ -181,4 +234,31 @@ IdentifyFirefighterServer <- function(
     }) |>
       shiny::bindEvent(input$submit_id_pin)
   })
+}
+
+#' Signed-in firefighter status UI
+#' @param id Module ID shared with [SignedInFirefighterServer()].
+#' @export
+SignedInFirefighterUI <- function(id) shiny::uiOutput(shiny::NS(id)("firefighter_checking"))
+
+#' Server for a signed-in firefighter status element
+#' @param id Module ID shared with [SignedInFirefighterUI()].
+#' @param current_user A `reactiveVal` containing the signed-in firefighter's
+#'   display name.
+#' @export
+SignedInFirefighterServer <- function(id, current_user) {
+  shiny::moduleServer(id, function(input, output, session) {
+    output$firefighter_checking <- shiny::renderUI({
+      firefighter <- current_user()
+      if (is.null(firefighter) || !nzchar(firefighter)) return(NULL)
+      shiny::tags$span(style = "font-size: 1.2em; font-weight: bold; color: #2b8764;", firefighter, " is currently performing checks")
+    })
+  })
+}
+
+#' Show a five-second signed-in notification
+#' @param firefighter Display name of the signed-in firefighter.
+#' @export
+NotifySignedInFirefighter <- function(firefighter) {
+  shiny::showNotification(paste(firefighter, "is signed in"), duration = 5)
 }

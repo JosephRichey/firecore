@@ -39,6 +39,34 @@ In your app's main server:
 InitializePackage(app_data)
 ```
 
+### Remembering a firefighter sign-in
+
+Place `AuthCookieUI()` once in the app UI, then pass a configuration to
+`IdentifyFirefighterServer()`. The module checks the signed browser cookie
+before showing its modal, restores an active firefighter when valid, refreshes
+the eight-hour expiry, and displays a five-second confirmation.
+
+```r
+cookie_config <- NewAuthCookieConfig(
+  secret = Sys.getenv("COOKIE_SIGNING_SECRET"),
+  cookie_name = "department_auth"
+)
+
+ui <- fluidPage(
+  AuthCookieUI(),
+  SignedInFirefighterUI("signed_in")
+)
+
+server <- function(input, output, session) {
+  current_user <- reactiveVal(NULL)
+  SignedInFirefighterServer("signed_in", current_user)
+  IdentifyFirefighterServer(
+    "identify_firefighter", current_user,
+    use_pin = FALSE, cookie_config = cookie_config
+  )
+}
+```
+
 ## Core Functions
 
 ### Database Operations

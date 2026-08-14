@@ -44,7 +44,21 @@ utils::globalVariables(c(
   "id",
   "firefighter_pin",
   "officer",
-  "is_deleted"
+  "is_deleted",
+  "user_id",
+  "config",
+  "now",
+  "use_pin",
+  "firefighter",
+  "current_user",
+  "cookie",
+  "session",
+  "firefighter_id",
+  "next_check_date",
+  "expiration_date",
+  "snooze_expires",
+  "check_date_time",
+  "reviewed_at"
 ))
 
 # Note: is.POSIXct and is.POSIXlt should be prefixed with lubridate::

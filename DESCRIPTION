@@ -10,7 +10,6 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     RSQLite,
-    shiny,
     testthat (>= 3.0.0),
     withr,
     mockery
@@ -20,10 +19,13 @@ Imports:
     dplyr,
     glue,
     hms,
+    htmltools,
     httr2,
     logger,
     lubridate,
+    openssl,
     rlang,
     shinyalert,
+    shiny,
     stringr,
     utils
